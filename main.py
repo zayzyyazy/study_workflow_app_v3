@@ -67,15 +67,16 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
     )
 
 
-app.mount(
-    "/static",
-    StaticFiles(directory=str(APP_ROOT / "app" / "static")),
-    name="static",
-)
-
+# Mount /static after API routes (FastAPI/Starlette convention; avoids routing edge cases).
 app.include_router(home.router)
 app.include_router(upload.router)
 app.include_router(courses.router)
 app.include_router(lectures.router)
 app.include_router(planner.router)
 app.include_router(settings_routes.router)
+
+app.mount(
+    "/static",
+    StaticFiles(directory=str(APP_ROOT / "app" / "static")),
+    name="static",
+)
