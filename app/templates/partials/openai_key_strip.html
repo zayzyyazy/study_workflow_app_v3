@@ -1,0 +1,17 @@
+{# Expects openai_key_status: personal | server | none #}
+{% if openai_key_status is defined %}
+{% if openai_key_status == 'none' %}
+<p class="openai-key-strip alert alert--error" role="status">
+  <span class="alert__icon" aria-hidden="true">!</span>
+  <span><strong>No API key.</strong> Add one in <a href="/settings">Settings</a>, or ask the host to set <code>OPENAI_API_KEY</code> on the server.</span>
+</p>
+{% elif openai_key_status == 'server' %}
+<p class="openai-key-strip muted small-print openai-key-strip--pad">
+  OpenAI: <strong>shared server key</strong> — add your own in <a href="/settings">Settings</a> to use your quota.
+</p>
+{% elif openai_key_status == 'personal' %}
+<p class="openai-key-strip muted small-print openai-key-strip--pad">
+  OpenAI: <strong>your personal key</strong> (saved in this browser).
+</p>
+{% endif %}
+{% endif %}

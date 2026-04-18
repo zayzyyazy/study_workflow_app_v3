@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="error-page">
+  <p class="error-page__code">{{ status_code }}</p>
+  <h1 class="error-page__title">{{ title }}</h1>
+  <p class="error-page__msg">{{ message }}</p>
+  {% if hint %}
+  <p class="muted small-print">{{ hint }}</p>
+  {% endif %}
+  <p style="margin-top: 1.5rem;">
+    <a class="button" href="/">Back to home</a>
+  </p>
+</div>
+{% endblock %}

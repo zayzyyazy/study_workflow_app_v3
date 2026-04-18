@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ title }} · Study AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='app-v3.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='vendor/katex/katex.min.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="app-v3 {% block body_class %}{% endblock %}">
+  {% set path = request.url.path %}
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="app-shell" id="app-shell">
+    <aside class="app-sidebar" id="app-sidebar" aria-label="Primary">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-mark">Study</span>
+        <span class="sidebar-brand-sub">AI</span>
+        <span class="sidebar-brand-v3" title="Web UI refresh">V3</span>
+      </div>
+      <nav class="sidebar-nav" aria-label="Main pages">
+        <a href="/" class="{% if path == '/' %}nav-link--active{% endif %}">
+          <span class="nav-icon" aria-hidden="true">⌂</span> Home
+        </a>
+        <a href="/planner" class="{% if path.startswith('/planner') %}nav-link--active{% endif %}">
+          <span class="nav-icon" aria-hidden="true">▦</span> Planner
+        </a>
+        <a href="/#courses" class="{% if path.startswith('/courses') %}nav-link--active{% endif %}">
+          <span class="nav-icon" aria-hidden="true">▤</span> Courses
+        </a>
+        <a href="/upload" class="{% if path.startswith('/upload') %}nav-link--active{% endif %}">
+          <span class="nav-icon" aria-hidden="true">↑</span> Upload
+        </a>
+        <a href="/settings" class="{% if path.startswith('/settings') %}nav-link--active{% endif %}">
+          <span class="nav-icon" aria-hidden="true">⚙</span> Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        Local-first · runs on your machine · optional OpenAI for generation
+      </div>
+    </aside>
+    <button type="button" class="app-sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true" tabindex="-1"></button>
+
+    <div class="app-content-column">
+      <header class="app-masthead">
+        <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-controls="app-sidebar" aria-expanded="false">
+          <span aria-hidden="true">☰</span>
+          <span class="visually-hidden">Open menu</span>
+        </button>
+        <a href="/" class="masthead-brand">Study AI <span class="muted" style="font-weight:600;font-size:0.75rem;">V3</span></a>
+      </header>
+
+      <main id="main-content" class="app-main">
+        <div class="container">
+          {% block global_alerts %}
+          {% if notice is defined and notice %}
+          <div class="alert alert--success" role="status">
+            <span class="alert__icon" aria-hidden="true">✓</span>
+            <span>{{ notice }}</span>
+          </div>
+          {% endif %}
+          {% if error is defined and error %}
+          <div class="alert alert--error" role="alert">
+            <span class="alert__icon" aria-hidden="true">!</span>
+            <span>{{ error }}</span>
+          </div>
+          {% endif %}
+          {% endblock %}
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        Study AI — lecture library and study workflow · no cloud storage
+      </footer>
+    </div>
+  </div>
+  <script defer src="{{ url_for('static', path='vendor/katex/katex.min.js') }}"></script>
+  <script defer src="{{ url_for('static', path='vendor/katex/contrib/auto-render.min.js') }}"></script>
+  <script defer src="{{ url_for('static', path='math-render.js') }}"></script>
+  <script defer src="{{ url_for('static', path='app-v3.js') }}"></script>
+  {% block page_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="crumb crumb-path" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="crumb-sep">/</span>
+  <span class="crumb-current">Settings</span>
+</nav>
+
+<div class="page-hero">
+  <p class="page-hero__eyebrow">OpenAI</p>
+  <h1 class="page-hero__title">API key</h1>
+  <p class="page-hero__lede">Your key is stored in a <strong>signed browser session</strong> on this server — not in the database. It overrides the host’s <code>OPENAI_API_KEY</code> for generation while you use this browser.</p>
+</div>
+
+{% if openai_key_status == 'personal' %}
+<p class="alert alert--success" role="status"><span class="alert__icon">✓</span> Status: <strong>personal key</strong> set for this browser.</p>
+{% elif openai_key_status == 'server' %}
+<p class="muted small-print" style="margin-bottom:1rem;">Status: using <strong>shared server key</strong>. Add yours below to use your own quota.</p>
+{% else %}
+<p class="alert alert--error" role="alert"><span class="alert__icon">!</span> Status: <strong>no key</strong> — generation will fail until you add a key here or the host configures the server.</p>
+{% endif %}
+
+<div class="form-card" style="max-width:32rem;">
+  <form class="stack-form" method="post" action="/settings/api-key" autocomplete="off">
+    <label for="openai-api-key-input">Your OpenAI API key</label>
+    <input id="openai-api-key-input" type="password" name="openai_api_key" placeholder="sk-…" autocomplete="off">
+    <p class="hint">Paste a key from <a href="https://platform.openai.com/api-keys" rel="noopener noreferrer">platform.openai.com</a>. Saving replaces the previous personal key.</p>
+    <p style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+      <button type="submit" class="button">Save key</button>
+    </p>
+  </form>
+  <form method="post" action="/settings/api-key/remove" class="no-loading" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+    <button type="submit" class="button button-secondary">Remove personal key</button>
+    <span class="muted small-print" style="margin-left:0.5rem;">Fall back to server key if available.</span>
+  </form>
+</div>
+{% endblock %}

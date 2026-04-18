@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-hero">
+  <p class="page-hero__eyebrow">Add material</p>
+  <h1 class="page-hero__title">Upload a lecture</h1>
+  <p class="page-hero__lede">Put a PDF or text file into a course. Text is extracted locally; generation uses your API key when you run it.</p>
+</div>
+
+<div class="form-card">
+<form class="stack-form" method="post" action="/upload" enctype="multipart/form-data">
+  <label>
+    Course
+    <select name="course_id">
+      <option value="">— Existing course (optional if new below) —</option>
+      {% for c in courses %}
+      <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label>
+    New course name (optional)
+    <input type="text" name="new_course_name" placeholder="e.g. Linear Algebra" autocomplete="off">
+  </label>
+  <p class="hint">Pick an existing course <em>or</em> type a new course name (new name takes priority).</p>
+
+  <label>
+    Lecture title (optional)
+    <input type="text" name="lecture_title" placeholder="Optional lecture title" autocomplete="off">
+  </label>
+  <p class="hint">Leave blank to auto-name from the file. New uploads are saved as <code>Lecture NN - Title</code> in the course folder.</p>
+
+  <label>
+    File <span class="req">*</span>
+    <input type="file" name="file" required>
+  </label>
+  <p class="hint">Supported for extraction: .txt, .md, .pdf, .docx (no OCR).</p>
+
+  <p style="margin-top: 1.25rem;">
+    <button type="submit" class="button">Upload and extract</button>
+  </p>
+</form>
+</div>
+{% endblock %}

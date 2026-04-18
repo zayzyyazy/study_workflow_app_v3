@@ -1,0 +1,684 @@
+{% extends "base.html" %}
+{% block extra_css %}
+<style>
+/* ── Study materials section flow ───────────────────────────── */
+.gen-section + .gen-section {
+  margin-top: 2.5rem;
+}
+
+/* Quick Overview: lighter intro feel */
+.gen-section-quick-overview .gen-section-title {
+  font-size: 1.05rem;
+  color: var(--color-muted, #666);
+  font-weight: 600;
+}
+
+/* Topic Map: compact card-like blocks per entry */
+.gen-section-topic-map .md-output h3 {
+  font-size: 1rem;
+  margin-top: 1.4rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--color-border, #e0e0e0);
+}
+.gen-section-topic-map .md-output hr {
+  margin: 0.5rem 0;
+  opacity: 0.3;
+}
+
+/* Topic Lessons (core_learning artifact): prominent heading + per-lesson blocks */
+.gen-section-core-learning > .gen-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.gen-section-core-learning .md-output h3 {
+  margin-top: 2rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--color-border, #e8e8e8);
+}
+.gen-section-core-learning .md-output h4 {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--color-muted, #444);
+}
+
+/* Revision Sheet: visually lighter */
+.gen-section-revision-sheet {
+  background: var(--color-surface-subtle, #fafafa);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+.gen-section-revision-sheet > .gen-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-muted, #555);
+}
+
+/* Study pack: visually secondary */
+.gen-section-study-pack {
+  opacity: 0.8;
+}
+.gen-section-study-pack > .gen-section-title {
+  font-size: 0.95rem;
+  color: var(--color-muted, #888);
+}
+
+/* Core Learning sub-TOC */
+.corelearning-subtoc {
+  background: var(--color-surface-subtle, #f5f5f5);
+  border-left: 3px solid var(--color-accent, #4a90d9);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.875rem;
+}
+.corelearning-subtoc-label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.corelearning-subtoc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.corelearning-subtoc-link {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #ddd);
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.82rem;
+}
+.corelearning-subtoc-link:hover {
+  background: var(--color-accent, #4a90d9);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Teach-me subtoc kept for legacy lectures */
+.teachme-subtoc {
+  background: var(--color-surface-subtle, #f5f5f5);
+  border-left: 3px solid var(--color-accent, #4a90d9);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.875rem;
+}
+.teachme-subtoc-label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.teachme-subtoc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.teachme-subtoc-link {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #ddd);
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.82rem;
+}
+.teachme-subtoc-link:hover {
+  background: var(--color-accent, #4a90d9);
+  color: #fff;
+  border-color: transparent;
+}
+
+.lecture-section--sources .source-files-list {
+  list-style: disc;
+  margin: 0.35rem 0 0.75rem 1.25rem;
+  padding: 0;
+}
+.lecture-section--sources .source-file-role {
+  font-size: 0.85em;
+  color: var(--color-muted, #666);
+}
+.add-source-form {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+.add-source-label {
+  font-size: 0.85rem;
+  color: var(--color-muted, #555);
+}
+.add-source-select {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.4rem;
+}
+
+/* Topic deep dives panel */
+.topic-deep-dive-panel {
+  margin: 1.5rem 0 2rem;
+  padding: 1rem 1.15rem;
+  background: var(--color-surface-subtle, #f8f9fb);
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #e4e4e4);
+}
+.topic-deep-dive-panel-title {
+  font-size: 1.05rem;
+  margin: 0 0 0.35rem;
+}
+.topic-deep-dive-panel-lede {
+  margin: 0 0 0.85rem;
+}
+.topic-deep-dive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.topic-deep-dive-table th,
+.topic-deep-dive-table td {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--color-border, #eee);
+  vertical-align: middle;
+}
+.topic-deep-dive-table th {
+  color: var(--color-muted, #666);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+.topic-dd-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+.topic-dd-priority {
+  font-size: 0.85rem;
+  color: var(--color-muted, #666);
+}
+.topic-dd-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #ddd);
+  margin-left: 0.35rem;
+  color: var(--color-muted, #555);
+}
+.topic-dd-badge--rec {
+  border-color: var(--color-accent, #4a90d9);
+  color: var(--color-accent, #4a90d9);
+}
+.topic-deep-dive-link {
+  font-size: 0.78rem;
+  margin-left: 0.45rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-border, #ccc);
+  text-decoration: none;
+  color: var(--color-accent, #4a90d9);
+  vertical-align: middle;
+}
+.topic-deep-dive-link:hover {
+  background: var(--color-accent, #4a90d9);
+  color: #fff;
+  border-color: transparent;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% set topic_deep_dive = topic_deep_dive | default({
+  'has_topic_map': false,
+  'topics': [],
+  'error': none,
+  'slug_by_title': {}
+}) %}
+{% set topic_deep_dive_slugs_json = topic_deep_dive_slugs_json | default('{}') %}
+<div class="workspace-lecture">
+<nav class="crumb crumb-path" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="crumb-sep" aria-hidden="true">/</span>
+  <a href="/courses/{{ lecture.course_id }}">{{ lecture.course_name }}</a>
+  <span class="crumb-sep" aria-hidden="true">/</span>
+  <span class="crumb-current lecture-crumb-current" title="{{ lecture.title }}">{{ lecture.title }}</span>
+</nav>
+
+{% include "partials/openai_key_strip.html" %}
+
+<header class="lecture-workspace-header">
+  <div class="lecture-title-row">
+    <h1 class="page-workspace-title lecture-workspace-title">{{ lecture.title }}</h1>
+    <form method="post" action="/lectures/{{ lecture.id }}/star" class="lecture-star-form-header">
+      <input type="hidden" name="starred" value="{% if lecture.is_starred | default(0) %}0{% else %}1{% endif %}">
+      <button type="submit" class="lecture-star-btn" title="{% if lecture.is_starred | default(0) %}Remove star{% else %}Star for home list{% endif %}">
+        {% if lecture.is_starred | default(0) %}<span class="lecture-star-on">★</span> Starred{% else %}<span class="lecture-star-off">☆</span> Star{% endif %}
+      </button>
+    </form>
+  </div>
+  <p class="lecture-workspace-sub lecture-workspace-sub--primary">
+    <a href="/courses/{{ lecture.course_id }}">{{ lecture.course_name }}</a>
+    <span class="course-workspace-sep">·</span>
+    Added <time datetime="{{ lecture.created_at }}">{{ lecture.created_at }}</time>
+  </p>
+  <div class="lecture-study-header-row">
+    {% set sp = lecture.study_progress | default('not_started') %}
+    {% if sp == 'done' %}
+    <span class="study-progress-pill study-progress-pill--done study-progress-pill--large">Done</span>
+    {% elif sp == 'in_progress' %}
+    <span class="study-progress-pill study-progress-pill--active study-progress-pill--large">In progress</span>
+    {% else %}
+    <span class="study-progress-pill study-progress-pill--todo study-progress-pill--large">Not started</span>
+    {% endif %}
+    <form class="study-progress-quick study-progress-quick--header" method="post" action="/lectures/{{ lecture.id }}/study-progress">
+      <label class="study-progress-label" for="lecture-study-header-select">Your study progress</label>
+      <select id="lecture-study-header-select" name="study_progress" class="study-progress-select" onchange="this.form.submit()">
+        {% for s in study_progress_states %}
+        <option value="{{ s }}" {% if sp == s %}selected{% endif %}>{% if s == 'not_started' %}Not started{% elif s == 'in_progress' %}In progress{% else %}Done{% endif %}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+  <p class="muted small-print lecture-workspace-tech">
+    Processing: <span class="status-badge status-{{ lecture.status | replace('_', '-') }} lecture-tech-badge">{{ lecture.status }}</span>
+  </p>
+  {% if lecture_analysis %}
+  <p class="muted small-print lecture-workspace-analysis">
+    Last run: language
+    {% if lecture_analysis.detected_language == 'de' %}German{% else %}English{% endif %}
+    · content profile
+    {% if lecture_analysis.content_profile == 'general' %}general{% elif lecture_analysis.content_profile == 'math' %}math{% elif lecture_analysis.content_profile == 'code' %}code{% elif lecture_analysis.content_profile == 'mixed' %}mixed{% else %}{{ lecture_analysis.content_profile }}{% endif %}
+    {% if lecture_analysis.lecture_kind %}· kind {{ lecture_analysis.lecture_kind }}{% endif %}
+    {% if lecture_analysis.depth_band %}· depth {{ lecture_analysis.depth_band }}{% endif %}
+    {% if lecture_analysis.get('has_exercise_material') %}· exercise-style sources{% endif %}
+  </p>
+  {% endif %}
+</header>
+
+<section class="lecture-section lecture-section--sources" aria-labelledby="sources-heading">
+  <h2 id="sources-heading" class="section-heading section-heading--sub">Source files</h2>
+  {% if storage.source_files %}
+  <ul class="source-files-list muted small-print">
+    {% for f in storage.source_files %}
+    <li>
+      <code>{{ f.name }}</code>
+      {% if f.role and f.role != 'other' %}<span class="source-file-role">({{ f.role }})</span>{% endif %}
+      {% if f.is_primary %}<span class="muted">· primary</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted small-print">No source list (legacy lecture).</p>
+  {% endif %}
+  {% if storage.multi_source %}
+  <p class="muted small-print source-multi-hint">Extraction combines <strong>all</strong> files below into one text for generation.</p>
+  {% endif %}
+  <form method="post" action="/lectures/{{ lecture.id }}/add-source" enctype="multipart/form-data" class="add-source-form lecture-inline-form">
+    <label class="add-source-label" for="add-source-role">Add file (optional role)</label>
+    <select id="add-source-role" name="role" class="add-source-select" aria-label="Source role hint for extraction">
+      <option value="">Auto from filename</option>
+      <option value="lecture">Lecture / slides</option>
+      <option value="exercise">Exercise / Übungsblatt</option>
+      <option value="notes">Notes / handout</option>
+      <option value="other">Other</option>
+    </select>
+    <label class="file-label add-source-file">
+      <span class="button button-secondary">Add source file</span>
+      <input type="file" name="file" required onchange="this.form.requestSubmit()">
+    </label>
+  </form>
+</section>
+
+<section class="lecture-section lecture-section--actions action-panel" aria-labelledby="lecture-actions-heading">
+  <h2 id="lecture-actions-heading" class="section-heading">Actions</h2>
+  <div class="action-row">
+    <form method="post" action="/lectures/{{ lecture.id }}/re-extract">
+      <button type="submit" class="button button-secondary">Re-run extraction</button>
+    </form>
+    <form method="post" action="/lectures/{{ lecture.id }}/replace-source" enctype="multipart/form-data" class="inline-file-form">
+      <label class="file-label">
+        <span class="button button-secondary">Replace primary source</span>
+        <input type="file" name="file" required onchange="this.form.requestSubmit()">
+      </label>
+    </form>
+    <form method="post" action="/lectures/{{ lecture.id }}/generate">
+      <button type="submit" class="button" {% if lecture.status not in ['ready_for_generation', 'generation_failed', 'generation_complete', 'generation_pending'] %}disabled title="Run extraction first until status is ready for generation"{% endif %}>Generate study materials</button>
+    </form>
+    <a class="button button-secondary" href="/lectures/{{ lecture.id }}/export.zip">Download lecture ZIP</a>
+    <a class="button button-danger-outline" href="/lectures/{{ lecture.id }}/confirm-delete">Delete lecture</a>
+  </div>
+  <p class="hint lecture-actions-hint">Replace primary: swaps the <strong>first</strong> source file; additional files stay. Re-run extraction rebuilds combined text. Generation needs <code>OPENAI_API_KEY</code> in <code>.env</code>.</p>
+</section>
+
+<details class="lecture-section lecture-user-tools">
+  <summary class="lecture-user-tools-summary">Study tools &amp; testing</summary>
+  <div class="lecture-user-tools-body">
+    <p class="muted small-print lecture-user-tools-lede">Safe resets only change your marks or refresh the combined pack file — not files or AI generation.</p>
+    <p class="lecture-user-tools-actions">
+      <form method="post" action="/lectures/{{ lecture.id }}/reset-my-progress" class="lecture-tool-form">
+        <label class="home-reset-check">
+          <input type="checkbox" name="confirm" value="1" required>
+          I want to reset <strong>study progress</strong> to Not started for this lecture only
+        </label>
+        <button type="submit" class="button button-secondary button-small">Reset my study progress</button>
+      </form>
+    </p>
+    <p class="lecture-user-tools-actions">
+      <form method="post" action="/lectures/{{ lecture.id }}/rebuild-study-pack" class="lecture-tool-form">
+        <label class="home-reset-check">
+          <input type="checkbox" name="confirm" value="1" required>
+          Rebuild <code>05_study_pack.md</code> from existing section files (no AI)
+        </label>
+        <button type="submit" class="button button-secondary button-small">Rebuild study pack</button>
+      </form>
+    </p>
+    <p class="lecture-user-tools-actions">
+      <form method="post" action="/lectures/{{ lecture.id }}/reset-user-flags" class="lecture-tool-form">
+        <label class="home-reset-check">
+          <input type="checkbox" name="confirm" value="1" required>
+          Reset <strong>study progress</strong> and <strong>star</strong> for this lecture
+        </label>
+        <button type="submit" class="button button-secondary button-small">Reset study marks &amp; star</button>
+      </form>
+    </p>
+  </div>
+</details>
+
+<section class="lecture-section lecture-section--materials-primary generated-materials" id="study-materials" aria-labelledby="study-materials-heading">
+  <h2 id="study-materials-heading" class="section-heading section-heading--hero">Study materials</h2>
+  <p class="section-lede lecture-materials-lede">Generated from your lecture — read here or export. Files live under <code>outputs/</code> and are replaced when you regenerate.</p>
+  <div class="study-pack-export-row">
+    <p class="study-pack-export muted small-print">
+      <a href="/lectures/{{ lecture.id }}/study_pack.md" download>Download <code>study_pack.md</code></a>
+      <span class="export-sep">·</span>
+      <a href="/lectures/{{ lecture.id }}/study_pack.html" target="_blank" rel="noopener">Printable page</a>
+    </p>
+    <button type="button" class="button button-secondary button-small study-pack-print-btn" onclick="window.open('/lectures/{{ lecture.id }}/study_pack.html','_blank')">Open print view</button>
+  </div>
+  <p class="muted small-print study-pack-print-hint">On the printable page, use <strong>Print</strong> → <strong>Save as PDF</strong> for a clean PDF.</p>
+
+  {% if generation_sections %}
+  {# TOC: main study sections only (skip study_pack) #}
+  <nav class="materials-toc materials-toc--prominent" aria-label="Jump to a section">
+    {% for sec in generation_sections %}
+    {% if sec.artifact_type != 'study_pack' %}
+    <a class="materials-toc-link" href="#gen-{{ sec.artifact_type }}">{{ sec.title }}</a>
+    {% endif %}
+    {% endfor %}
+  </nav>
+  {% endif %}
+
+  {% if topic_deep_dive.has_topic_map and topic_deep_dive.topics %}
+  <section class="topic-deep-dive-panel" aria-labelledby="topic-deep-dives-heading">
+    <h3 id="topic-deep-dives-heading" class="topic-deep-dive-panel-title">Topic deep dives</h3>
+    <p class="muted small-print topic-deep-dive-panel-lede">
+      Focused study pages per roadmap topic — deeper than the overview. Priority ≥ 7 is highlighted as a good first choice.
+    </p>
+    <table class="topic-deep-dive-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Priority</th>
+          <th class="topic-dd-actions">Deep dive</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in topic_deep_dive.topics %}
+        <tr>
+          <td>
+            {{ t.title }}
+            {% if t.recommended %}<span class="topic-dd-badge topic-dd-badge--rec">Recommended</span>{% endif %}
+          </td>
+          <td class="topic-dd-priority">{% if t.priority is not none %}{{ t.priority }}/10{% else %}—{% endif %}</td>
+          <td class="topic-dd-actions">
+            {% if t.has_deep_dive %}
+            <a class="button button-secondary button-small" href="/lectures/{{ lecture.id }}/topics/{{ t.slug }}">Open</a>
+            {% else %}
+            <form method="post" action="/lectures/{{ lecture.id }}/topics/{{ t.slug }}/generate" style="display:inline;">
+              <button type="submit" class="button button-secondary button-small">Generate</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% elif topic_deep_dive.error %}
+  <p class="muted small-print">Topic deep dives: {{ topic_deep_dive.error }}</p>
+  {% endif %}
+
+  {% for sec in generation_sections %}
+  <article class="gen-section gen-section-{{ sec.artifact_type | replace('_', '-') }}" id="gen-{{ sec.artifact_type }}">
+    <h3 class="gen-section-title">{{ sec.title }} <span class="muted file-tag">{{ sec.filename }}</span></h3>
+
+    {# Sub-TOC for Topic Lessons (artifact id core_learning, file 03_core_learning.md) #}
+    {% if sec.artifact_type == "core_learning" %}
+    <nav class="corelearning-subtoc" id="corelearning-subtoc" hidden>
+      <span class="corelearning-subtoc-label">Lessons:</span>
+      <div class="corelearning-subtoc-links" id="corelearning-subtoc-links"></div>
+    </nav>
+    {% endif %}
+
+    {# Sub-TOC for Teach Me (legacy lectures) #}
+    {% if sec.artifact_type == "teach_me" %}
+    <nav class="teachme-subtoc" id="teachme-subtoc" hidden>
+      <span class="teachme-subtoc-label">Teach Me topics:</span>
+      <div class="teachme-subtoc-links" id="teachme-subtoc-links"></div>
+    </nav>
+    {% endif %}
+
+    {% if sec.html %}
+    <div class="md-output" id="gen-content-{{ sec.artifact_type }}">{{ sec.html | safe }}</div>
+    {% else %}
+    <div class="placeholder-inline muted">Not generated yet. Use <strong>Generate study materials</strong> when extraction is ready.</div>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+
+<section class="lecture-section lecture-section--concepts concepts-secondary lecture-section--support" aria-labelledby="concepts-heading">
+  <h2 id="concepts-heading" class="section-heading section-heading--sub">Key concepts</h2>
+  <p class="muted small-print section-lede">From generated materials (deterministic extract). Shared terms also appear on the <a href="/courses/{{ lecture.course_id }}">course concept index</a>.</p>
+  {% if concepts_ui["total_stored"] == 0 %}
+  <p class="concepts-empty muted">No concepts indexed yet. Generate study materials to extract terms and headings.</p>
+  {% elif concepts_ui["all_filtered_out"] %}
+  <p class="concepts-empty muted">Nothing to show after quality filtering. Try regenerating study materials, or adjust the source glossaries.</p>
+  {% else %}
+  <ul class="concept-tags concept-tags--compact">
+    {% for c in concepts_ui["items"] %}
+    <li>{{ c.name }}</li>
+    {% endfor %}
+  </ul>
+  {% if concepts_ui["hit_display_cap"] %}
+  <p class="muted small-print concepts-cap-note">Showing {{ concepts_ui["shown"] }} concepts (capped for clarity).</p>
+  {% endif %}
+  {% endif %}
+</section>
+
+<details class="lecture-section lecture-section--storage lecture-collapsible storage-panel" id="lecture-storage">
+  <summary class="lecture-collapsible-summary">
+    <span class="section-heading section-heading--sub lecture-collapsible-summary-title">Files &amp; folders</span>
+    <span class="muted small-print lecture-collapsible-summary-hint">Paths on this computer</span>
+  </summary>
+  <div class="lecture-collapsible-body">
+    <p class="muted small-print section-lede">Display names (<strong>{{ lecture.course_name }}</strong>, <strong>{{ lecture.title }}</strong>) are what you see in the library; folder names stay filesystem-safe.</p>
+    <dl class="storage-dl">
+      <dt>Course</dt>
+      <dd>
+        <a href="/courses/{{ lecture.course_id }}">{{ lecture.course_name }}</a>
+        {% if storage.course_folder_rel %}
+        <div class="storage-sub muted small-print">On disk: <code class="path-chip">{{ storage.course_folder_rel }}</code></div>
+        {% endif %}
+      </dd>
+      <dt>Lecture folder</dt>
+      <dd>
+        {% if storage.lecture_folder_name %}
+        <div class="storage-folder-label">{{ storage.lecture_folder_name }}</div>
+        {% endif %}
+        {% if storage.lecture_folder_rel %}
+        <div><code class="path-line">{{ storage.lecture_folder_rel }}</code></div>
+        {% else %}
+        <span class="muted">—</span>
+        {% endif %}
+      </dd>
+      <dt>Source file</dt>
+      <dd>
+        <span class="storage-file-name">{{ lecture.source_file_name }}</span>
+        {% if storage.source_file_rel %}
+        <div><code class="path-line">{{ storage.source_file_rel }}</code></div>
+        {% endif %}
+      </dd>
+      <dt>Generated outputs</dt>
+      <dd>
+        {% if storage.outputs_rel %}
+        <code class="path-line">{{ storage.outputs_rel }}</code>
+        {% else %}
+        <span class="muted">—</span>
+        {% endif %}
+      </dd>
+      <dt>Extracted text</dt>
+      <dd>
+        {% if storage.extracted_rel %}
+        <code class="path-line">{{ storage.extracted_rel }}</code>
+        {% else %}
+        <span class="muted">Not written yet (or extraction failed)</span>
+        {% endif %}
+      </dd>
+    </dl>
+    {% if storage.full_lecture_root %}
+    <details class="storage-details">
+      <summary>Full path on this computer</summary>
+      <p class="muted small-print">Paste into Finder → Go → Go to Folder…, or a terminal.</p>
+      <pre class="path-raw" id="js-lecture-full-path">{{ storage.full_lecture_root }}</pre>
+      <p class="storage-copy-row">
+        <button type="button" class="button button-secondary button-small" id="js-copy-lecture-path">Copy full path</button>
+        <span class="copy-feedback muted" id="js-copy-feedback" hidden>Copied</span>
+      </p>
+    </details>
+    {% endif %}
+  </div>
+</details>
+
+{% if extracted_preview %}
+<details class="lecture-section lecture-section--extracted lecture-collapsible" id="lecture-extracted" open>
+  <summary class="lecture-collapsible-summary">
+    <span class="section-heading section-heading--sub lecture-collapsible-summary-title">Extracted text</span>
+    <span class="muted small-print lecture-collapsible-summary-hint">Raw preview (truncated)</span>
+  </summary>
+  <div class="lecture-collapsible-body">
+    <pre class="text-preview text-preview--scroll">{{ extracted_preview }}</pre>
+  </div>
+</details>
+{% elif lecture.status == 'extraction_failed' %}
+<section class="lecture-section lecture-section--extracted lecture-section--support" aria-labelledby="extracted-fail-heading">
+  <h2 id="extracted-fail-heading" class="section-heading section-heading--sub">Extracted text</h2>
+  <p class="muted">Extraction did not produce usable text. Use <strong>Re-run extraction</strong> after fixing the source file, or check <code>meta.json</code>.</p>
+</section>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+(function () {
+  var btn = document.getElementById("js-copy-lecture-path");
+  var pathEl = document.getElementById("js-lecture-full-path");
+  var feedback = document.getElementById("js-copy-feedback");
+  if (!btn || !pathEl) return;
+  btn.addEventListener("click", function () {
+    var text = pathEl.textContent.trim();
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        if (feedback) {
+          feedback.hidden = false;
+          setTimeout(function () { feedback.hidden = true; }, 2000);
+        }
+      });
+    }
+  });
+})();
+
+// Sub-TOC for Topic Lessons (### = each lesson)
+(function () {
+  var root = document.getElementById("gen-content-core_learning");
+  var toc = document.getElementById("corelearning-subtoc");
+  var links = document.getElementById("corelearning-subtoc-links");
+  if (!root || !toc || !links) return;
+  var heads = root.querySelectorAll("h3, h4");
+  if (!heads || heads.length === 0) return;
+  var created = 0;
+  heads.forEach(function (h, idx) {
+    if (h.tagName === "H4") return; // only ### headings
+    var txt = (h.textContent || "").trim();
+    if (!txt) return;
+    if (!h.id) { h.id = "cl-topic-" + idx; }
+    var a = document.createElement("a");
+    a.className = "corelearning-subtoc-link";
+    a.href = "#" + h.id;
+    a.textContent = txt;
+    links.appendChild(a);
+    created += 1;
+  });
+  if (created > 0) { toc.hidden = false; }
+})();
+
+// "Deep dive" links on Topic Roadmap + Topic Lessons (### titles must match roadmap)
+(function () {
+  var raw = {{ topic_deep_dive_slugs_json | safe }};
+  var map = {};
+  try {
+    map = typeof raw === "string" ? JSON.parse(raw) : (raw || {});
+  } catch (e) {
+    map = {};
+  }
+  var lid = {{ lecture.id }};
+  function addLinks(containerId) {
+    var root = document.getElementById(containerId);
+    if (!root) return;
+    var heads = root.querySelectorAll("h3");
+    heads.forEach(function (h) {
+      var txt = (h.textContent || "").trim();
+      var slug = map[txt];
+      if (!slug) return;
+      if (h.querySelector(".topic-deep-dive-link")) return;
+      var a = document.createElement("a");
+      a.className = "topic-deep-dive-link";
+      a.href = "/lectures/" + lid + "/topics/" + encodeURIComponent(slug);
+      a.textContent = "Deep dive";
+      h.appendChild(document.createTextNode(" "));
+      h.appendChild(a);
+    });
+  }
+  addLinks("gen-content-topic_map");
+  addLinks("gen-content-core_learning");
+})();
+
+// Sub-TOC for Teach Me (legacy lectures only)
+(function () {
+  var root = document.getElementById("gen-content-teach_me");
+  var toc = document.getElementById("teachme-subtoc");
+  var links = document.getElementById("teachme-subtoc-links");
+  if (!root || !toc || !links) return;
+  var heads = root.querySelectorAll("h2, h3");
+  if (!heads || heads.length === 0) return;
+  var created = 0;
+  heads.forEach(function (h, idx) {
+    var txt = (h.textContent || "").trim();
+    if (!txt) return;
+    if (!h.id) { h.id = "teachme-topic-" + idx; }
+    var a = document.createElement("a");
+    a.className = "teachme-subtoc-link";
+    a.href = "#" + h.id;
+    a.textContent = txt;
+    links.appendChild(a);
+    created += 1;
+  });
+  if (created > 0) { toc.hidden = false; }
+})();
+</script>
+{% endblock %}
