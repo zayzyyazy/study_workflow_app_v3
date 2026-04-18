@@ -33,3 +33,6 @@ courses/
 # Runtime database — recreated on first run
 data/app.db
 data/*.db
+
+# Local migration backups (timestamped copies before import)
+migration_backups/
